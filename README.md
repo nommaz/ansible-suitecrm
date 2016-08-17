@@ -1,21 +1,21 @@
 SuiteCRM
 ======
 
-Installs [SuiteCRM](http://suitecrm.com/) MAX edition using Nginx.
+Installs [SuiteCRM](http://suitecrm.com/) using Nginx.
 
 Requirements
 ------------
 
 This role was created on/for Ubuntu Trusty installations and was specifically tested in an OpenVZ container environment.
 
-You must download the SuiteCRM-7.1.2-MAX.zip file from the SuiteCRM site and place it in files/ before using this role.  SuiteCRM requires registration and login to download files.
+You must download the SuiteCRM-7.7.1.zip file from the SuiteCRM site and place it in files/ before using this role.  SuiteCRM requires registration and login to download files.
 
 Role Variables
 --------------
 
 The role uses the following variables, set in the defaults/main.yml file:
 
-* `suitecrm_version` - Specific version of SuiteCRM to install (defaults to 7.1.5)
+* `suitecrm_version` - Specific version of SuiteCRM to install (defaults to 7.7.1)
 * `suitecrm_install_dir` - Directory to install SuiteCRM (defaults to /var/www)
 * `suitecrm_frontend_host` - Hostname of SuiteCRM install (defaults to localhost)
 * `suitecrm_database_host` - Hostname of MySQL database (defaults to localhost)
@@ -26,28 +26,21 @@ The role uses the following variables, set in the defaults/main.yml file:
 Dependencies
 ------------
 
-Depends on the [Ansibles.mysql](https://galaxy.ansible.com/list#/roles/509) role.  See "Requirements" section for file dependencies.
-
-Usage
------
-
-    ansible-galaxy install Dhar.suitecrm
-
-Also check the [Ansible Galaxy](https://galaxy.ansibleworks.com/intro) about page.
+Depends on the mysql module of Ansible, yet included
 
 Example Playbook
 -------------------------
 
-Example playbook for installing SuiteCRM database and web servers on separate systems:
+Example playbook for installing SuiteCRM database and web servers on standalone system:
 
     ---
-    - hosts: crm-db
+    - hosts: crm
       roles:
-      - { role: Ansibles.mysql, mysql_users: [{name: "{{ suitecrm_database_user }}", pass: "{{ suitecrm_database_password }}", host: "{{ suitecrm_frontend_host }}", priv: "*.*:ALL"}]}
-
-    - hosts: crm-fe
-      roles:
-      - { role: ansible-suitecrm }
+        - { role: ansible-suitecrm }
+      vars:
+        - suitecrm_database_user: admin
+        - suitecrm_database_password: AdminSuiteCRM
+        - suitecrm_frontend_host: localhost
 
 License
 -------
@@ -57,6 +50,8 @@ MIT
 Author Information
 ------------------
 
-Gary Arnold
+Created by Gary Arnold
 
-[GitHub project page](https://github.com/Dhar/ansible-suitecrm)
+Updated by paulbsd
+
+[GitHub project page](https://github.com/paulbsd/ansible-suitecrm)

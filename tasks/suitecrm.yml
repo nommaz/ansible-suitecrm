@@ -15,9 +15,17 @@
     - php-xml-parser
     - mysql-server
     - libmysqlclient-dev
+    - python-pip
 
 - name: Install pip dependencies
   pip: name=mysql state=present
+
+- name: Creates MySQL user
+  mysql_user:
+    name="{{ suitecrm_database_user }}"
+    password="{{ suitecrm_database_password }}"
+    host="{{ suitecrm_frontend_host }}"
+    priv="*.*:ALL"
 
 - name: Find PHP ini file
   shell: find /etc -name php.ini | fgrep fpm
