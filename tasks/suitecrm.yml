@@ -3,12 +3,21 @@
   apt: pkg={{ item }} state=present
   with_items:
     - unzip
-    - php5-cli
-    - php5-fpm
-    - php5-mysql
-    - php5-imap
-    - php5-curl
-    - php5-gd
+    - php-cli
+    - php-fpm
+    - php-mysql
+    - php-imap
+    - php-curl
+    - php-gd
+    - php-zip
+    - php-mbstring
+    - php-xml
+    - php-xml-parser
+    - mysql-server
+    - libmysqlclient-dev
+
+- name: Install pip dependencies
+  pip: name=mysql state=present
 
 - name: Find PHP ini file
   shell: find /etc -name php.ini | fgrep fpm
@@ -45,13 +54,13 @@
   - restart nginx
 
 - name: Configure PHP-fpm request_terminate_timeout
-  lineinfile: dest=/etc/php5/fpm/php-fpm.conf line="request_terminate_timeout = 300"
+  lineinfile: dest=/etc/php/7.0/fpm/php-fpm.conf line="request_terminate_timeout = 300"
   notify:
   - restart php-fpm
   - restart nginx
 
 - name: Enable PHP IMPA module
-  shell: php5enmod imap
+  shell: phpenmod imap
   notify:
   - restart php-fpm
   - restart nginx
@@ -60,18 +69,18 @@
   file: path={{ suitecrm_install_dir }} state=directory
 
 - name: Copy SuiteCRM zipfile
-  copy: src='SuiteCRM-{{ suitecrm_version }} MAX.zip' dest={{ suitecrm_install_dir }}
+  copy: src='SuiteCRM-{{ suitecrm_version }}.zip' dest={{ suitecrm_install_dir }}
 
 # Doesn't really create "{{ suitecrm_install_dir }}/suitecrm", but we want to not do all this work if that symlink already exists
 # Would be nice if ansible could handle multiple files in the creates arg :(
 - name: Unzip SuiteCRM
-  command: unzip -o 'SuiteCRM-{{ suitecrm_version }} MAX.zip'
+  command: unzip -o 'SuiteCRM-{{ suitecrm_version }}.zip'
   args:
     chdir: "{{ suitecrm_install_dir }}"
-    creates: "{{ suitecrm_install_dir }}/suitecrm"
+    creates: "{{ suitecrm_install_dir }}/SuiteCRM-{{ suitecrm_version }}"
 
 - name: Create versionless symlink
-  file: src={{ suitecrm_install_dir }}/suitecrm-{{ suitecrm_version }}-max dest={{ suitecrm_install_dir }}/suitecrm state=link
+  file: src={{ suitecrm_install_dir }}/SuiteCRM-{{ suitecrm_version }} dest={{ suitecrm_install_dir }}/suitecrm state=link
 
 - name: Set up crontab
   cron: name="suitecrm scheduler" job="su -s /bin/bash -c 'cd /var/www/suitecrm; php -f cron.php > /dev/null 2>&1' www-data"
